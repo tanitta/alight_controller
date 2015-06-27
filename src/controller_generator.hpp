@@ -1,6 +1,7 @@
 #pragma once
 #include "ofxXmlSettings.h"
 #include "variable_controller.hpp"
+#include "network_gate.hpp"
 
 namespace variable_controller {
 	class ControllerGenerator {
@@ -9,6 +10,7 @@ namespace variable_controller {
 		
 		std::shared_ptr<VariableController> variable_controller_;
 		ValueBox& value_box_;
+		NetworkGate& network_gate_;
 		
 		void save_xml(const std::string& name){
 
@@ -26,27 +28,9 @@ namespace variable_controller {
 
 		};
 		
-		// std::map<std::string,std::string> widget_attribute(){
-		// 	return
-		// }
-
-		//osc
-
-		//gui
-
-		// void make_widget_from(std::map<std::string,std::string> params, const int& gui_index){
-		// 	std::cout<<params["type"]<<std::endl;
-		// 	if(params["type"]=="Spacer"){
-		// 		variable_controller_->
-		// 	};
-		// 	if(params["type"]=="Label"){
-		// 	};
-		// };
-		
 		void make_controller(){
 			xml_.pushTag("guis");
 			//gui毎の処理
-			std::cout<<"guis : "<<xml_.getNumTags("gui")<<std::endl;
 			for (int gui_index = 0; gui_index < xml_.getNumTags("gui"); gui_index++) {
 				//add gui
 				std::string gui_name = xml_.getAttribute("gui","name", "", gui_index);
@@ -72,13 +56,16 @@ namespace variable_controller {
 		}
 
 		public:
-			ControllerGenerator(ValueBox& value_box):value_box_(value_box),variable_controller_(new VariableController(value_box)){};
+			ControllerGenerator(ValueBox& value_box, NetworkGate& network_gate):
+				value_box_(value_box),
+				network_gate_(network_gate),
+				variable_controller_(new VariableController(value_box,network_gate)){};
+			
 			virtual ~ControllerGenerator(){};
 			
 			std::shared_ptr<VariableController> generate_from(std::string file_name){
 				load_xml(file_name);
 				make_controller();
-				std::cout<<"vc_generated"<<std::endl;
 				variable_controller_->reset_gui_position(212);
 				return variable_controller_;
 			};

@@ -1,0 +1,30 @@
+<guis>
+	<gui name="Test1">
+		<widget 
+			type="Slider"
+			name="midi_control_20"
+			val_type="float"
+			min="0.0"
+			max="1.0"
+			val_name="midi_control_20"
+			/>
+		<widget 
+			type="Slider"
+			name="float_test"
+			val_type="float"
+			min="0.0"
+			max="1.0"
+			val_name="float_test"
+			/>
+	</gui>
+	<gui name="Test1">
+		<widget 
+			type="Slider"
+			name="cloud_size_int"
+			val_type="int"
+			min="0"
+			max="255"
+			val_name="cloud_size_int"
+			/>
+	</gui>
+</guis>

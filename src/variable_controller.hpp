@@ -1,6 +1,7 @@
 #pragma once
 #include "ofxUI.h"
 #include "value_box.hpp"
+#include "network_gate.hpp"
 
 namespace variable_controller {
 	class VariableController {
@@ -11,18 +12,26 @@ namespace variable_controller {
 		
 		// std::shared_ptr<ValueBox> value_box_sptr_;
 		ValueBox& value_box_;
+		NetworkGate& network_gate_;
 		
 		public:
 			
-		VariableController(ValueBox& value_box):value_box_(value_box){};
+		VariableController(ValueBox& value_box, NetworkGate& network_gate):value_box_(value_box),
+		network_gate_(network_gate){};
 
 		virtual ~VariableController(){
 		};
 
 		void add_gui(std::string name){
 			guis_.push_back(std::shared_ptr<ofxUISuperCanvas>(new ofxUISuperCanvas( name )));
+			ofAddListener(guis_[guis_.size()-1]->newGUIEvent, this, &VariableController::gui_event);
 			std::cout<<"gui size : "<<guis_.size()<<std::endl;
 		};
+		
+		// void add_listener(ofApp* app, const int& gui_index){
+			// ofAddListener(guis_[gui_index]->newGUIEvent, app, &ofApp::guiEvent);
+		// };
+		
 		void reset_gui_position(const int& distance = 212){
 			for(int gui_index = 0; gui_index < guis_.size(); gui_index++){
 				guis_[gui_index]->setPosition(gui_index*distance,0);
@@ -30,10 +39,6 @@ namespace variable_controller {
 			}
 		
 		};
-		
-		// void set_value_box(std::shared_ptr<ValueBox> value_box_sptr){
-		// 	value_box_sptr_ = value_box_sptr;
-		// };
 		
 		void add_widget(std::map<std::string,std::string> params, const int gui_index){
 			if(params["type"]=="Spacer"){
@@ -52,18 +57,7 @@ namespace variable_controller {
 					};
 					guis_[gui_index]->addIntSlider(params["name"], val_min, val_max, &value_box_.get_int_ref(params["val_name"]));
 				};
-				// if(params["val_type"] == "int"){
-				// 	int val_min = std::atoi(params["min"].c_str());
-				// 	int val_max = std::atoi(params["max"].c_str());
-				// 	// if(val_ints_.find(params["val_name"]) == val_ints_.end()){
-				// 	// 	val_ints_[params["val_name"]] = 0;
-				// 		value_box_.set(params["val_naame"],0);
-				// 	// };
-				// 	// guis_[gui_index]->addIntSlider(params["name"], val_min, val_max, &val_ints_.at(params["val_name"]));
-				// 	guis_[gui_index]->addIntSlider(params["name"], val_min, val_max, &value_box_.get_int_ref(params["val_name"]));
-				// };
-				// value_box_.set("hoge",5.0f);
-				// std::cout<<value_box_.get_float_ref("hoge")<<std::endl;
+				
 				if(params["val_type"] == "float"){
 					float val_min = std::atof(params["min"].c_str());
 					float val_max = std::atof(params["max"].c_str());
@@ -101,7 +95,25 @@ namespace variable_controller {
 		// };
 
 		void gui_event(ofxUIEventArgs &e){
-			std::cout<<"event"<<std::endl;
-		};
+			std::string val_name = e.getName();
+			// std::cout<<e.getName()<<" kind : "<<e.getKind()<<std::endl;
+			if(e.getKind() == 4 || e.getKind() == 42){
+				std::string val_type = value_box_.type_of(val_name);
+				if(val_type == "int"){
+					int val;
+					value_box_.get(val_name,val);
+					network_gate_.send(val_name,val_type);
+					std::cout<<"send val(name : "<<val_name<<" type : "<<val_type<<" val : "<<val<<std::endl;
+				};
+				if(val_type == "float"){
+					float val;
+					value_box_.get(val_name,val);
+					network_gate_.send(val_name,val_type);
+					std::cout<<"send val(name : "<<val_name<<" type : "<<val_type<<" val : "<<val<<std::endl;
+				};
+			
+			}
+			// network_gate_.send
+		}
 	};
 } // namespace variable_controller

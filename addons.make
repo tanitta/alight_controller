@@ -1,4 +1,5 @@
 ofxXmlSettings
 ofxUI
 ofxMidi
+ofxOsc
 
