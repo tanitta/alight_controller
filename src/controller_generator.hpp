@@ -8,6 +8,7 @@ namespace variable_controller {
 		ofxXmlSettings xml_;
 		
 		std::shared_ptr<VariableController> variable_controller_;
+		ValueBox& value_box_;
 		
 		void save_xml(const std::string& name){
 
@@ -71,12 +72,13 @@ namespace variable_controller {
 		}
 
 		public:
-			ControllerGenerator():variable_controller_(new VariableController()){};
+			ControllerGenerator(ValueBox& value_box):value_box_(value_box),variable_controller_(new VariableController(value_box)){};
 			virtual ~ControllerGenerator(){};
 			
 			std::shared_ptr<VariableController> generate_from(std::string file_name){
 				load_xml(file_name);
 				make_controller();
+				std::cout<<"vc_generated"<<std::endl;
 				variable_controller_->reset_gui_position(212);
 				return variable_controller_;
 			};
